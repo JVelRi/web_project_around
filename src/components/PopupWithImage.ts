@@ -1,7 +1,7 @@
 import { Popup } from "./Popup.js";
-import { ICardData } from "./Card.js";
+import type { CardData } from "../utils/types.js";
 
-export class PopupWithImage extends Popup<ICardData> {
+export class PopupWithImage extends Popup<CardData> {
   private imageElement: HTMLImageElement;
   private captionElement: HTMLElement;
 
@@ -15,7 +15,7 @@ export class PopupWithImage extends Popup<ICardData> {
     ) as HTMLElement;
   }
 
-  public open(data: ICardData): void {
+  public open(data: CardData): void {
     this.imageElement.src = data.link;
     this.imageElement.alt = data.name;
     this.captionElement.textContent = data.name;

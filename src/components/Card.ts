@@ -1,22 +1,53 @@
-export interface ICardData {
-  name: string;
-  link: string;
+import type { CardData } from "../utils/types.js";
+
+export interface ICardHandlers {
+  handleCardClick: (data: CardData) => void;
+  handleLikeClick: (card: Card) => void;
+  handleDeleteClick: (card: Card) => void;
 }
 
+const LIKE_ACTIVE_CLASS = "card__like-button_is-active";
+
 export class Card {
-  private data: ICardData;
+  private data: CardData;
   private templateSelector: string;
-  private handleCardClick: (data: ICardData) => void;
+  private currentUserId: string;
+  private handlers: ICardHandlers;
   private element!: HTMLElement;
+  private likeButton!: HTMLButtonElement;
+  private deleteButton!: HTMLButtonElement;
 
   constructor(
-    data: ICardData,
+    data: CardData,
     templateSelector: string,
-    handleCardClick: (data: ICardData) => void,
+    currentUserId: string,
+    handlers: ICardHandlers,
   ) {
     this.data = data;
     this.templateSelector = templateSelector;
-    this.handleCardClick = handleCardClick;
+    this.currentUserId = currentUserId;
+    this.handlers = handlers;
+  }
+
+  public getId(): string {
+    return this.data._id;
+  }
+
+  public isOwnedByCurrentUser(): boolean {
+    return this.data.owner === this.currentUserId;
+  }
+
+  public isLikedByCurrentUser(): boolean {
+    return this.data.isLiked;
+  }
+
+  public updateLikeStatus(isLiked: boolean): void {
+    this.data.isLiked = isLiked;
+    this.likeButton.classList.toggle(LIKE_ACTIVE_CLASS, isLiked);
+  }
+
+  public removeCard(): void {
+    this.element.remove();
   }
 
   private getTemplate(): HTMLElement {
@@ -30,26 +61,20 @@ export class Card {
   }
 
   private setEventListeners(): void {
-    const likeButton = this.element.querySelector(
-      ".card__like-button",
-    ) as HTMLButtonElement;
-    const deleteButton = this.element.querySelector(
-      ".card__delete-button",
-    ) as HTMLButtonElement;
     const cardImage = this.element.querySelector(
       ".card__image",
     ) as HTMLImageElement;
 
-    likeButton.addEventListener("click", () => {
-      likeButton.classList.toggle("card__like-button_is-active");
+    this.likeButton.addEventListener("click", () => {
+      this.handlers.handleLikeClick(this);
     });
 
-    deleteButton.addEventListener("click", () => {
-      this.element.remove();
+    this.deleteButton.addEventListener("click", () => {
+      this.handlers.handleDeleteClick(this);
     });
 
     cardImage.addEventListener("click", () => {
-      this.handleCardClick(this.data);
+      this.handlers.handleCardClick(this.data);
     });
   }
 
@@ -62,10 +87,22 @@ export class Card {
     const cardTitle = this.element.querySelector(
       ".card__title",
     ) as HTMLElement;
+    this.likeButton = this.element.querySelector(
+      ".card__like-button",
+    ) as HTMLButtonElement;
+    this.deleteButton = this.element.querySelector(
+      ".card__delete-button",
+    ) as HTMLButtonElement;
 
     cardImage.src = this.data.link;
     cardImage.alt = this.data.name;
     cardTitle.textContent = this.data.name;
+
+    this.likeButton.classList.toggle(LIKE_ACTIVE_CLASS, this.data.isLiked);
+
+    if (!this.isOwnedByCurrentUser()) {
+      this.deleteButton.remove();
+    }
 
     this.setEventListeners();
 

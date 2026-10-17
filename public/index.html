@@ -18,15 +18,28 @@
       </header>
       <main class="content">
         <section class="profile page__section">
-          <img class="profile__image" src="./images/avatar.jpg" alt="Avatar" />
+          <div class="profile__avatar-wrapper">
+            <img
+              class="profile__image"
+              id="profile-avatar"
+              src=""
+              alt="Avatar"
+            />
+            <button
+              aria-label="Cambiar foto de perfil"
+              class="profile__avatar-edit-button"
+              id="avatar-edit-button"
+              type="button"
+            ></button>
+          </div>
           <div class="profile__info">
-            <h1 class="profile__title">Jacques Cousteau</h1>
+            <h1 class="profile__title"></h1>
             <button
               aria-label="Editar perfil"
               class="profile__edit-button"
               type="button"
             ></button>
-            <p class="profile__description">Explorador</p>
+            <p class="profile__description"></p>
           </div>
           <button
             aria-label="Agregar tarjeta"
@@ -39,7 +52,7 @@
         </section>
       </main>
       <footer class="footer page__section">
-        <p class="footer__copyright">© 2025 Around The U.S.</p>
+        <p class="footer__copyright">© 2026 Around The U.S.</p>
       </footer>
 
       <div class="popup" id="edit-popup">
@@ -100,10 +113,7 @@
               maxlength="30"
               type="text"
             />
-            <span
-              class="popup__input-error"
-              id="place-name-input-error"
-            ></span>
+            <span class="popup__input-error" id="place-name-input-error"></span>
             <input
               class="popup__input popup__input_type_url"
               id="url-input"
@@ -115,6 +125,41 @@
             <span class="popup__input-error" id="url-input-error"></span>
             <button class="button popup__button" type="submit">Crear</button>
           </form>
+        </div>
+      </div>
+
+      <div class="popup" id="avatar-popup">
+        <div class="popup__content">
+          <button
+            aria-label="Cerrar ventana emergente"
+            class="popup__close"
+            type="button"
+          ></button>
+          <h3 class="popup__title">Cambiar foto de perfil</h3>
+          <form class="popup__form" id="avatar-form" novalidate>
+            <input
+              class="popup__input popup__input_type_avatar"
+              id="avatar-input"
+              name="avatar"
+              placeholder="Enlace a la imagen"
+              required
+              type="url"
+            />
+            <span class="popup__input-error" id="avatar-input-error"></span>
+            <button class="button popup__button" type="submit">Guardar</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="popup" id="delete-popup">
+        <div class="popup__content popup__content_type_confirm">
+          <button
+            aria-label="Cerrar ventana emergente"
+            class="popup__close"
+            type="button"
+          ></button>
+          <h3 class="popup__title">¿Estás seguro?</h3>
+          <button class="button popup__button" type="button">Sí</button>
         </div>
       </div>
 
