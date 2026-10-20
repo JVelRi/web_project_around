@@ -2,14 +2,17 @@ import { Popup } from "./Popup.js";
 
 export type FormSubmitCallback = (
   inputValues: Record<string, string>,
-  submitButton: HTMLButtonElement,
-) => void;
+) => void | Promise<void>;
+
+const DEFAULT_LOADING_TEXT = "Guardando...";
 
 export class PopupWithForm extends Popup {
   private handleFormSubmit: FormSubmitCallback;
   private formElement: HTMLFormElement;
-  private inputList: HTMLInputElement[];
-  private buttonElement: HTMLButtonElement;
+  private inputElements: HTMLInputElement[];
+  private submitButton: HTMLButtonElement;
+  private defaultButtonText: string;
+  private isSubmitting = false;
 
   constructor(popupSelector: string, handleFormSubmit: FormSubmitCallback) {
     super(popupSelector);
@@ -17,30 +20,51 @@ export class PopupWithForm extends Popup {
     this.formElement = this.popupElement.querySelector(
       ".popup__form",
     ) as HTMLFormElement;
-    this.inputList = Array.from(
+    this.inputElements = Array.from(
       this.formElement.querySelectorAll(".popup__input"),
     );
-    this.buttonElement = this.formElement.querySelector(
+    this.submitButton = this.formElement.querySelector(
       ".popup__button",
     ) as HTMLButtonElement;
+    this.defaultButtonText = this.submitButton.textContent || "";
   }
 
   private getInputValues(): Record<string, string> {
     const values: Record<string, string> = {};
 
-    this.inputList.forEach((inputElement) => {
+    this.inputElements.forEach((inputElement) => {
       values[inputElement.name] = inputElement.value;
     });
 
     return values;
   }
 
+  private renderLoading(isLoading: boolean): void {
+    this.submitButton.disabled = isLoading;
+    this.submitButton.textContent = isLoading
+      ? DEFAULT_LOADING_TEXT
+      : this.defaultButtonText;
+  }
+
   public setEventListeners(): void {
     super.setEventListeners();
 
-    this.formElement.addEventListener("submit", (evt: SubmitEvent) => {
+    this.formElement.addEventListener("submit", async (evt: SubmitEvent) => {
       evt.preventDefault();
-      this.handleFormSubmit(this.getInputValues(), this.buttonElement);
+
+      if (this.isSubmitting) {
+        return;
+      }
+
+      this.isSubmitting = true;
+      this.renderLoading(true);
+
+      try {
+        await this.handleFormSubmit(this.getInputValues());
+      } finally {
+        this.isSubmitting = false;
+        this.renderLoading(false);
+      }
     });
   }
 

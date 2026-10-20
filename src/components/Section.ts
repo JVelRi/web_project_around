@@ -16,8 +16,8 @@ export class Section<T> {
     ) as HTMLElement;
   }
 
-  public renderItems(): void {
-    this.items.forEach((item) => {
+  public renderItems(items: T[] = this.items): void {
+    items.forEach((item) => {
       this.renderer(item);
     });
   }
